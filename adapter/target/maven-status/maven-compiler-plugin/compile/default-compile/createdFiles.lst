@@ -1,0 +1,6 @@
+com\simonpd\Adaptador\AdapterEmpleados.class
+com\simonpd\Cliente\iServicioEmpleados.class
+com\simonpd\Servicio\ServicioREST.class
+com\simonpd\Servicio\ServicioPostgres.class
+com\simonpd\Entidad\Empleado.class
+com\simonpd\Main.class
