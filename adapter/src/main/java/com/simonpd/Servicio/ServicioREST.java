@@ -1,14 +1,12 @@
 package com.simonpd.Servicio;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.simonpd.Cliente.iServicioEmpleados;
+import com.simonpd.Entidad.Empleado;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpResponse;
-
-import com.simonpd.Cliente.iServicioEmpleados;
-import com.simonpd.Entidad.Empleado;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 
 public class ServicioREST implements iServicioEmpleados {
@@ -16,9 +14,15 @@ public class ServicioREST implements iServicioEmpleados {
 
     @Override
     public Empleado obtenerEmpleadoPorId(long id) {
+        // Por compatibilidad con la interfaz, delega a la nueva firma
+        return obtenerEmpleadoPorCodigo(String.valueOf(id));
+    }
+
+    // Nueva firma diferente: recibe String
+    public Empleado obtenerEmpleadoPorCodigo(String codigo) {
         Empleado empleado = null;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet request = new HttpGet(URL + "/" + id);
+            HttpGet request = new HttpGet(URL + "/" + codigo);
             ClassicHttpResponse response = httpClient.execute(request);
 
             if (response.getCode() == 200) {

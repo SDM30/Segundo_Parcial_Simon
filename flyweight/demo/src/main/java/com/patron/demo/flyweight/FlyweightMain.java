@@ -115,7 +115,7 @@ public class FlyweightMain {
             System.out.println("Canción: " + topCanciones.get(i) + " - Repeticiones: " + topRepeticiones.get(i));
         }
 
-        // Paso 2: Buscar listas que contengan no contengan las canciones más repetidas
+        // Paso 2: Buscar listas que no contengan las canciones más repetidas
         List<ListaReproduccion> resultado = new ArrayList<>();
         for (ListaReproduccion lista : listas) {
             boolean contieneCancionRepetida = false;
@@ -144,7 +144,7 @@ public class FlyweightMain {
 
             // Inserta todas en la base de datos
             for (ListaReproduccion lista : listasMenosUsadas) {
-                //ConexionPostgres.guardarListaReproduccionManual(lista);
+                //SSConexionPostgres.guardarListaReproduccionManual(lista);
             }
 
             System.gc();
@@ -153,13 +153,5 @@ public class FlyweightMain {
             long memoriaLiberada = memoriaUsadaBytes - memoriaUsadaDespues;
             System.out.println("Memoria liberada: " + (memoriaLiberada / 1000000) + " MB");
         }
-    }
-
-    public static void prueba1() {
-
-    }
-
-    public static void prueba2() {
-
     }
 }
