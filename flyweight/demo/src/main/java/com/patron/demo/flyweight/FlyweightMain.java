@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.patron.demo.implementacion.FabricaArtistas;
 import com.patron.demo.implementacion.FabricaCanciones;
 import com.patron.demo.implementacion.ListaReproduccion;
 
@@ -20,7 +21,7 @@ import com.patron.demo.implementacion.ListaReproduccion;
 public class FlyweightMain {
 
     private static final String[] NombreCanciones = new String[1000];
-    private static final String[] NombreArtistas = new String[100];
+    private static final String[] NombreArtistas = new String[1000];
     private static final String[] NombresListas = new String[4100000];
     private static final List<ListaReproduccion> Listas = new ArrayList<>();
         
@@ -33,7 +34,7 @@ public class FlyweightMain {
         
         Runtime runtime = Runtime.getRuntime();
         System.out.println("MaxMemory > " + (runtime.maxMemory()/1000000));
-        FabricaCanciones.HabilitarFlyweight = true;
+        habilitarFlyweight(true);
         InicializarArreglos();
         CrearListaDinamica();
         System.out.println("Total Listas > " + Listas.size());
@@ -75,5 +76,10 @@ public class FlyweightMain {
         for (int c = 0; c < NombresListas.length; c++) {
             NombresListas[c] = "PlayList " + (c + 1);
         }
+    }
+
+    public static void habilitarFlyweight(boolean habilitarFlyweight) {
+        FabricaArtistas.HabilitarFlyweight = habilitarFlyweight;
+        FabricaCanciones.HabilitarFlyweight = habilitarFlyweight;
     }
 }
