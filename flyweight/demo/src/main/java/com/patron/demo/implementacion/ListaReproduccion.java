@@ -6,13 +6,6 @@
 
 package com.patron.demo.implementacion;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,21 +13,9 @@ import java.util.List;
  *
  * @author Fabrizio Bolaño
  */
-@Entity
-@Table(name = "listas_reproduccion")
 public class ListaReproduccion {
-    @Id
-    @GeneratedValue
     private Long id;
-
     private String NombreLista;
-
-    @ManyToMany
-    @JoinTable(
-        name = "lista_canciones",
-        joinColumns = @JoinColumn(name = "lista_id"),
-        inverseJoinColumns = @JoinColumn(name = "cancion_id")
-    )
     private List<Cancion> Canciones = new ArrayList<>();
 
     public ListaReproduccion() {}

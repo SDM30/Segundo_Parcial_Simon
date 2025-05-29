@@ -5,10 +5,10 @@
  */
 package com.patron.demo.flyweight;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
+import com.patron.demo.Repositorio.ConexionPostgres;
+import com.patron.demo.implementacion.Cancion;
 import com.patron.demo.implementacion.FabricaArtistas;
 import com.patron.demo.implementacion.FabricaCanciones;
 import com.patron.demo.implementacion.ListaReproduccion;
@@ -20,9 +20,9 @@ import com.patron.demo.implementacion.ListaReproduccion;
  */
 public class FlyweightMain {
 
-    private static final String[] NombreCanciones = new String[1000];
+    private static final String[] NombreCanciones = new String[2000];
     private static final String[] NombreArtistas = new String[1000];
-    private static final String[] NombresListas = new String[4100000];
+    private static final String[] NombresListas = new String[41000];
     private static final List<ListaReproduccion> Listas = new ArrayList<>();
         
     public static void main(String[] args) {
@@ -39,8 +39,9 @@ public class FlyweightMain {
         CrearListaDinamica();
         System.out.println("Total Listas > " + Listas.size());
         long memoryUsed = runtime.totalMemory() - runtime.freeMemory();
-        System.out.println("Memoria Usada => " + (memoryUsed / 1000000));//
+        System.out.println("Memoria Usada => " + (memoryUsed / 1000000));
         Listas.get(0).ImprimirLista();
+        liberarListasMenosUsadas(1000000, runtime, 30);
         
     }
     
@@ -52,7 +53,7 @@ public class FlyweightMain {
             for (int i = 0; i < 10; i++) {
                 int song = random.nextInt(NombreCanciones.length);
                 String nombreCancion = NombreCanciones[song];
-                String nombreArtista = NombreArtistas[song % 100];
+                String nombreArtista = NombreArtistas[song % 50];
                 playList.addCancion(nombreCancion, nombreArtista);
             }
             Listas.add(playList);
@@ -81,5 +82,84 @@ public class FlyweightMain {
     public static void habilitarFlyweight(boolean habilitarFlyweight) {
         FabricaArtistas.HabilitarFlyweight = habilitarFlyweight;
         FabricaCanciones.HabilitarFlyweight = habilitarFlyweight;
+    }
+
+    public static List<ListaReproduccion> obtenerListasConCancionesMenosRepetidas(
+            List<ListaReproduccion> listas,
+            long topN
+    ) {
+        // Paso 1: Obtener las canciones más repetidas
+        Map<String, Integer> cancionRepeticion = new HashMap<>();
+        for (ListaReproduccion lista : listas) {
+            for (Cancion cancion : lista.getCanciones()) {
+                String clave = cancion.getNombreCancion() + "|" + cancion.getAutor().getNombreArtista();
+                int valor = cancionRepeticion.getOrDefault(clave, 0);
+                cancionRepeticion.put(clave, valor + 1);
+            }
+        }
+
+        List<String> topCanciones = cancionRepeticion.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(topN)
+                .map(entradaMap -> entradaMap.getKey())
+                .toList();
+
+        List<Integer> topRepeticiones = cancionRepeticion.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(topN)
+                .map(entradaMap -> entradaMap.getValue())
+                .toList();
+
+        System.out.println("Canciones y repeticiones en fase:");
+        for (int i = 0; i < topCanciones.size(); i++) {
+            System.out.println("Canción: " + topCanciones.get(i) + " - Repeticiones: " + topRepeticiones.get(i));
+        }
+
+        // Paso 2: Buscar listas que contengan no contengan las canciones más repetidas
+        List<ListaReproduccion> resultado = new ArrayList<>();
+        for (ListaReproduccion lista : listas) {
+            boolean contieneCancionRepetida = false;
+            for (Cancion cancion : lista.getCanciones()) {
+                String clave = cancion.getNombreCancion() + "|" + cancion.getAutor().getNombreArtista();
+                if (topCanciones.contains(clave)) {
+                    contieneCancionRepetida = true;
+                    break;
+                }
+            }
+            if (!contieneCancionRepetida) {
+                resultado.add(lista);
+            }
+        }
+        return resultado;
+    }
+
+    public static void liberarListasMenosUsadas(long memoriaMaximaBytes, Runtime runtime, long topN) {
+        System.out.println("Liberando listas menos usadas si la memoria usada supera " + (memoriaMaximaBytes / 1000000) + " MB");
+        long memoriaUsadaBytes = runtime.totalMemory() - runtime.freeMemory();
+        if (memoriaUsadaBytes > memoriaMaximaBytes) {
+            List<ListaReproduccion> listasMenosUsadas = obtenerListasConCancionesMenosRepetidas(Listas, topN);
+
+            // Elimina todas de la lista principal de una vez
+            Listas.removeAll(listasMenosUsadas);
+
+            // Inserta todas en la base de datos
+            for (ListaReproduccion lista : listasMenosUsadas) {
+                //ConexionPostgres.guardarListaReproduccionManual(lista);
+            }
+
+            System.gc();
+            long memoriaUsadaDespues = runtime.totalMemory() - runtime.freeMemory();
+            System.out.println("Listas menos usadas liberadas. Memoria usada: " + (memoriaUsadaDespues / 1000000) + " MB");
+            long memoriaLiberada = memoriaUsadaBytes - memoriaUsadaDespues;
+            System.out.println("Memoria liberada: " + (memoriaLiberada / 1000000) + " MB");
+        }
+    }
+
+    public static void prueba1() {
+
+    }
+
+    public static void prueba2() {
+
     }
 }

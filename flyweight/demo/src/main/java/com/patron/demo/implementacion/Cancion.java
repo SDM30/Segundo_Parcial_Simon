@@ -5,32 +5,14 @@
  */
 package com.patron.demo.implementacion;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-
 /**
  *
  * @author Fabrizio Bolaño
  */
-@Entity
-@Table(name = "canciones")
 public class Cancion {
-    @Id
-    @GeneratedValue
     private Long id;
-
     private String NombreCancion;
-
-    @ManyToOne
-    @JoinColumn(name = "artista_id")
     private Artista autor;
-
-    @Lob
     private byte[] Cancion = new byte[1000000];
 
     public Cancion(Long id, String NombreCancion) {
